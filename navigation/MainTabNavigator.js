@@ -73,4 +73,7 @@ export default createBottomTabNavigator({
   HomeStack,
   ReminderStack,
   SettingsStack,
+},{
+  swipeEnabled: true,
+  shifting: true
 });
