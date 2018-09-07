@@ -8,6 +8,10 @@ import {
 import { Container, Header, Content, Card, CardItem, Text, Left, Right, Body, Title, Button, Icon } from 'native-base';
 import { WebBrowser } from 'expo';
 
+import * as firebase from 'firebase';
+
+firebase.initializeApp(firebaseConfig);
+
 export default class HomeScreen extends React.Component {
   static navigationOptions = {
     header: null,
@@ -45,7 +49,7 @@ export default class HomeScreen extends React.Component {
             <Body>
               <Button onPress={_handleAddPress} transparent>
                 <Right>
-                  <Icon name='ios-add'/>
+                  <Icon name='md-add'/>
                 </Right>
               </Button>
             </Body>
@@ -55,14 +59,14 @@ export default class HomeScreen extends React.Component {
     }
     return (
       <Container>
-        <Header>
+        <Header style={styles.header}>
           <Left />
           <Body>
             <Title>ホーム</Title>
           </Body>
           <Right>
             <Button onPress={_handleAddPress} transparent>
-              <Icon name='ios-add'/>
+              <Icon name='md-add'/>
             </Button>
           </Right>
         </Header>
@@ -86,7 +90,20 @@ const styles = StyleSheet.create({
   contentContainer: {
     paddingTop: 30,
   },
+  header: {
+    paddingTop: 30,
+    height: 54 + Header.currentHeight,
+  },
 });
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBZT5aRVmNc1uLaW4Rts_Xt8m-d2PPDScA",
+  authDomain: "aqual-e9327.firebaseapp.com",
+  databaseURL: "https://aqual-e9327.firebaseio.com",
+  projectId: "aqual-e9327",
+  storageBucket: "aqual-e9327.appspot.com",
+  messagingSenderId: "1092530998404"
+};
 /*
 <Container>
   <Header>
