@@ -4,18 +4,12 @@ import { createStackNavigator, createBottomTabNavigator } from 'react-navigation
 
 import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
-import AddTankScreen from '../screens/AddTankScreen';
+//import LinksScreen from '../screens/LinksScreen';
 import ReminderScreen from '../screens/ReminderScreen';
-import AddReminderScreen from '../screens/AddReminderScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 
 const HomeStack = createStackNavigator({
-  Home: {
-    screen: HomeScreen,
-  },
-  AddTank: {
-    screen: AddTankScreen,
-  },
+  Home: HomeScreen,
 });
 
 HomeStack.navigationOptions = {
@@ -34,7 +28,6 @@ HomeStack.navigationOptions = {
 
 const ReminderStack = createStackNavigator({
   Reminder: ReminderScreen,
-  AddReminder: AddReminderScreen,
 });
 
 ReminderStack.navigationOptions = {
@@ -65,4 +58,7 @@ export default createBottomTabNavigator({
   HomeStack,
   ReminderStack,
   SettingsStack,
+},{
+  swipeEnabled: true,
+  shifting: true
 });

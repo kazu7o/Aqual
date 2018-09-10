@@ -2,15 +2,21 @@ import React from 'react';
 import {
   Image,
   StyleSheet,
-  ScrollView,
 } from 'react-native';
-
-import { Container, Header, Content, Card, CardItem, Text, Left, Right, Body, Title, Button, Icon } from 'native-base';
-import { WebBrowser } from 'expo';
-
-import * as firebase from 'firebase';
-
-firebase.initializeApp(firebaseConfig);
+import {
+  Container,
+  Header,
+  Content,
+  Card,
+  CardItem,
+  Text,
+  Left,
+  Right,
+  Body,
+  Title,
+  Button,
+  Icon
+} from 'native-base';
 
 export default class HomeScreen extends React.Component {
   static navigationOptions = {
@@ -47,7 +53,7 @@ export default class HomeScreen extends React.Component {
           </CardItem>
           <CardItem>
             <Body>
-              <Button onPress={_handleAddPress} transparent>
+              <Button transparent>
                 <Right>
                   <Icon name='md-add'/>
                 </Right>
@@ -65,7 +71,7 @@ export default class HomeScreen extends React.Component {
             <Title>ホーム</Title>
           </Body>
           <Right>
-            <Button onPress={_handleAddPress} transparent>
+            <Button onPress={() => this.props.navigation.navigate('AddTank')} transparent>
               <Icon name='md-add'/>
             </Button>
           </Right>
@@ -78,60 +84,9 @@ export default class HomeScreen extends React.Component {
   }
 }
 
-_handleAddPress = () => {
-  WebBrowser.openBrowserAsync('https://docs.expo.io/versions/latest/guides/development-mode');
-};
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  contentContainer: {
-    paddingTop: 30,
-  },
   header: {
     paddingTop: 30,
     height: 54 + Header.currentHeight,
   },
 });
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBZT5aRVmNc1uLaW4Rts_Xt8m-d2PPDScA",
-  authDomain: "aqual-e9327.firebaseapp.com",
-  databaseURL: "https://aqual-e9327.firebaseio.com",
-  projectId: "aqual-e9327",
-  storageBucket: "aqual-e9327.appspot.com",
-  messagingSenderId: "1092530998404"
-};
-/*
-<Container>
-  <Header>
-    <Left />
-    <Body>
-      <Title>ホーム</Title>
-    </Body>
-    <Right />
-  </Header>
-  <Content>
-    <Card style={{flex: 0}}>
-      <CardItem bordered>
-        <Left>
-          <Body>
-            <Text>私の水槽１</Text>
-            <Text note>7/21~</Text>
-          </Body>
-        </Left>
-      </CardItem>
-      <CardItem>
-        <Body>
-          <Image source={require('../assets/images/robot-prod.png')}/>
-          <Text>水温：　取得してくる</Text>
-          <Text>水位：　取得してくる</Text>
-          <Text>魚：　登録情報から引用</Text>
-        </Body>
-      </CardItem>
-    </Card>
-  </Content>
-</Container>
-*/

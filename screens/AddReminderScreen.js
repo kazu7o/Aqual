@@ -15,7 +15,7 @@ import {
   Icon
 } from 'native-base';
 
-export default class ReminderScreen extends React.Component {
+export default class AddReminderScreen extends React.Component {
   static navigationOptions = {
     header: null,
   };
@@ -24,17 +24,17 @@ export default class ReminderScreen extends React.Component {
     return (
       <Container>
         <Header style={styles.header}>
-          <Left />
-          <Body>
-            <Title>リマインダー</Title>
-          </Body>
-          <Right>
-            <Button onPress={() => this.props.navigation.navigate("AddReminder")} transparent>
-              <Icon name='md-add' />
+          <Left>
+            <Button onPress={() => this.props.navigation.navigate("Reminder")} transparent>
+              <Icon name='md-arrow-back' />
             </Button>
-          </Right>
+          </Left>
+          <Body style={styles.title}>
+            <Title>リマインダー追加</Title>
+          </Body>
         </Header>
         <Content>
+          <Text>この画面でリマインダー追加</Text>
         </Content>
       </Container>
     );
@@ -45,5 +45,8 @@ const styles = StyleSheet.create({
   header: {
     paddingTop: 30,
     height: 54 + Header.currentHeight,
+  },
+  title: {
+    paddingRight: 30,
   },
 });
