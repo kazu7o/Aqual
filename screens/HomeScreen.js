@@ -2,6 +2,7 @@ import React from 'react';
 import {
   Image,
   StyleSheet,
+  RefreshControl
 } from 'react-native';
 import {
   Container,
@@ -17,51 +18,85 @@ import {
   Button,
   Icon
 } from 'native-base';
+import { ImagePicker, Permissions, SQLite } from 'expo';
+
+const db = SQLite.openDatabase('aqual.db');
 
 export default class HomeScreen extends React.Component {
   static navigationOptions = {
     header: null,
   };
-
+  constructor(props){
+    super(props);
+    this.state = {
+      hasCameraRollPermissions: null,
+      tanks: null,
+      refreshing: false,
+    };
+  }
+  async componentWillMount(){
+    // カメラロールへのアクセス許可
+    const {status} = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+    this.setState({ hasCameraRollPermissions: status === 'granted' });
+  }
+  componentWillMount(){
+    db.transaction(
+      tx => {
+        tx.executeSql("select * from tanks", [], (_, { rows }) => this.setState({tanks: rows}));
+      },
+    );
+  }
+  _onRefresh = () => {
+    this.setState({refreshing: true});
+    db.transaction(
+      tx => {
+        tx.executeSql("select * from tanks", [], (_, { rows }) => this.setState({tanks: rows}));
+      },
+    );
+    setTimeout(() => {
+      this.setState({refreshing: false});
+    }, 2000);
+  }
   render() {
     var Cards = [];
-    for(var i = 0; i < 3; i++){
-      Cards.push(
-        <Card style={{flex: 0}} key={i}>
-          <CardItem bordered>
-            <Left>
+    if(this.state.tanks != null){
+      var tanks = this.state.tanks;
+      for(var i = 0; i < tanks['length']; i++){
+        Cards.push(
+          <Card style={{flex: 0}} key={i}>
+            <CardItem bordered>
+              <Left>
+                <Body>
+                  <Text>{tanks['_array'][i]['name']}</Text>
+                  <Text note>{tanks['_array'][i]['date']}</Text>
+                </Body>
+              </Left>
+            </CardItem>
+            <CardItem bordered>
               <Body>
-                <Text>私の水槽１</Text>
-                <Text note>2018/07/21~2ヶ月20日</Text>
+                <Image source={{ uri: tanks['_array'][i]['photo'] }} style={{ width: 200, height: 200}} />
+                <Text>{tanks['_array'][i]['type']}</Text>
               </Body>
-            </Left>
-          </CardItem>
-          <CardItem bordered>
-            <Body>
-              <Image source={require('../assets/images/robot-prod.png')}/>
-              <Text>・淡水アクアリウム</Text>
-              <Text>水槽サイズ：50x50x50</Text>
-              <Text>水量：5リットル</Text>
-            </Body>
-          </CardItem>
-          <CardItem>
-            <Body>
-              <Text>・生体記録</Text>
-              <Text>09/05 いつも通り</Text>
-              <Text>09/06 元気♪</Text>
-            </Body>
-          </CardItem>
-          <CardItem>
-            <Body>
-              <Button transparent>
-                <Right>
-                  <Icon name='md-add'/>
-                </Right>
-              </Button>
-            </Body>
-          </CardItem>
-        </Card>
-      );
+            </CardItem>
+            <CardItem>
+              <Body>
+                <Text>・生体記録</Text>
+              </Body>
+            </CardItem>
+            {/*
+            <CardItem>
+              <Body>
+                <Button transparent onPress={() => console.log(this.state.tanks)}>
+                  <Right>
+                    <Icon name='md-add'/>
+                  </Right>
+                </Button>
+              </Body>
+            </CardItem>
+            */}
+          </Card>
+        );
+      }
     }
     return (
       <Container>
@@ -76,7 +111,11 @@ export default class HomeScreen extends React.Component {
             </Button>
           </Right>
         </Header>
-        <Content padder>
+        <Content
+          refreshControl={<RefreshControl
+          refreshing={this.state.refreshing}
+          onRefresh={()=>{this._onRefresh()}}/>
+        }>
           {Cards}
         </Content>
       </Container>

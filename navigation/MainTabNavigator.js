@@ -7,7 +7,7 @@ import HomeScreen from '../screens/HomeScreen';
 import AddTankScreen from '../screens/AddTankScreen';
 import ReminderScreen from '../screens/ReminderScreen';
 import AddReminderScreen from '../screens/AddReminderScreen';
-import SettingsScreen from '../screens/SettingsScreen';
+import CalcScreen from '../screens/CalcScreen';
 
 const HomeStack = createStackNavigator({
   Home: {
@@ -47,12 +47,12 @@ ReminderStack.navigationOptions = {
   ),
 };
 
-const SettingsStack = createStackNavigator({
-  Settings: SettingsScreen,
+const CalcStack = createStackNavigator({
+  Calc: CalcScreen,
 });
 
-SettingsStack.navigationOptions = {
-  tabBarLabel: 'Settings',
+CalcStack.navigationOptions = {
+  tabBarLabel: 'Calculate',
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
@@ -64,5 +64,5 @@ SettingsStack.navigationOptions = {
 export default createBottomTabNavigator({
   HomeStack,
   ReminderStack,
-  SettingsStack,
+  CalcStack,
 });

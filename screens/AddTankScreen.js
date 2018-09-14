@@ -23,23 +23,9 @@ import {
   ListItem,
   Radio,
 } from 'native-base';
-import { ImagePicker, Permissions } from 'expo';
-{/*
-import * as firebase from 'firebase';
+import { ImagePicker, Permissions, SQLite } from 'expo';
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBZT5aRVmNc1uLaW4Rts_Xt8m-d2PPDScA",
-  authDomain: "aqual-e9327.firebaseapp.com",
-  databaseURL: "https://aqual-e9327.firebaseio.com",
-  projectId: "aqual-e9327",
-  storageBucket: "aqual-e9327.appspot.com",
-  messagingSenderId: "1092530998404"
-};
-
-firebase.initializeApp(firebaseConfig);
-*/}
-
-
+const db = SQLite.openDatabase('aqual.db');
 
 export default class AddTankScreen extends React.Component {
   static navigationOptions = {
@@ -65,10 +51,20 @@ export default class AddTankScreen extends React.Component {
       selected2: value
     });
   }
+
   async componentWillMount(){
     // カメラロールへのアクセス許可
     const {status} = await Permissions.askAsync(Permissions.CAMERA_ROLL);
     this.setState({ hasCameraRollPermissions: status === 'granted' });
+  }
+
+  //水槽テーブル作成（初期化）
+  componentDidMount(){
+    db.transaction(tx => {
+      tx.executeSql(
+        'create table if not exists tanks (id integer primary key not null, name text, date text, type text, photo text);'
+      );
+    });
   }
   render() {
     let {hasCameraRollPermissions} = this.state;
@@ -142,7 +138,8 @@ export default class AddTankScreen extends React.Component {
                 <Text>ギャラリーから選択</Text>
               </Button>
             </Item>
-            <Button block primary>
+            {hasCameraRollPermissions && image && <Image source={{ uri: image }} style={{ width: 200, height: 200}} />}
+            <Button block primary onPress={this.submit}>
               <Text>登録</Text>
             </Button>
             <Text>
@@ -150,28 +147,32 @@ export default class AddTankScreen extends React.Component {
               chosenDate: {this.state.chosenDate.toString()}
               state: {this.state.selected2}
             </Text>
-            {hasCameraRollPermissions && image && <Image source={{ uri: image }} style={{ width: 200, height: 200}} />}
           </Form>
         </Content>
       </Container>
     );
   }
-}
-
-{/*
-_pickImage = async () => {
-  let result = await ImagePicker.launchImageLibraryAsync({
-    allowsEditing: true,
-    aspect: [16, 9],
-  });
-
-  console.log(result);
-
-  if(!result.cancelled){
-    this.setState({ image: result.uri });
+  submit = () => {
+    db.transaction(
+      tx => {
+        count = tx.executeSql('select count(*) from tanks');
+        tx.executeSql('insert into tanks (id, name, date, type, photo) values (?, ?, ?, ?, ?)', [count + 1, this.state.name, this.state.chosenDate.toString(), this.state.selected2, this.state.image],null,null);
+        tx.executeSql('select * from tanks', [], (_, { rows }) => console.log(JSON.stringify(rows)));
+      },
+    );
+    this.props.navigation.navigate("Home");
   }
-};
-*/}
+
+  //全レコード削除
+  sakujo = () => {
+    db.transaction(
+      tx => {
+        tx.executeSql("delete from tanks;");
+      },
+    );
+    this.props.navigation.navigate("Home")
+  };
+}
 
 const styles = StyleSheet.create({
   header: {
