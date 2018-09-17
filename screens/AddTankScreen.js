@@ -119,19 +119,6 @@ export default class AddTankScreen extends React.Component {
                 <Picker.Item label="汽水" value="汽水" />
               </Picker>
             </Item>
-            {/*
-            <Item stackedLabel>
-              <Label>状態</Label>
-              <ListItem>
-                <Radio selected={true} />
-                <Text>運営中</Text>
-              </ListItem>
-              <ListItem>
-                <Radio selected={false} />
-                <Text>終了</Text>
-              </ListItem>
-            </Item>
-            */}
             <Item stackedLabel>
               <Label>サムネイル</Label>
               <Button onPress={async () => {let result = await ImagePicker.launchImageLibraryAsync(); console.log(result); this.setState({image: result.uri})}} transparent>
@@ -142,11 +129,6 @@ export default class AddTankScreen extends React.Component {
             <Button block primary onPress={this.submit}>
               <Text>登録</Text>
             </Button>
-            <Text>
-              name: {this.state.name}
-              chosenDate: {this.state.chosenDate.toString()}
-              state: {this.state.selected2}
-            </Text>
           </Form>
         </Content>
       </Container>
@@ -156,7 +138,7 @@ export default class AddTankScreen extends React.Component {
     db.transaction(
       tx => {
         count = tx.executeSql('select count(*) from tanks');
-        tx.executeSql('insert into tanks (id, name, date, type, photo) values (?, ?, ?, ?, ?)', [count + 1, this.state.name, this.state.chosenDate.toString(), this.state.selected2, this.state.image],null,null);
+        tx.executeSql('insert into tanks (id, name, date, type, photo) values (?, ?, ?, ?, ?)', [count + 1, this.state.name, this.state.chosenDate.toString().substr(4, 12), this.state.selected2, this.state.image],null,null);
         tx.executeSql('select * from tanks', [], (_, { rows }) => console.log(JSON.stringify(rows)));
       },
     );

@@ -10,12 +10,8 @@ import AddReminderScreen from '../screens/AddReminderScreen';
 import CalcScreen from '../screens/CalcScreen';
 
 const HomeStack = createStackNavigator({
-  Home: {
-    screen: HomeScreen,
-  },
-  AddTank: {
-    screen: AddTankScreen,
-  },
+  Home: HomeScreen,
+  AddTank: AddTankScreen,
 });
 
 HomeStack.navigationOptions = {
@@ -25,8 +21,8 @@ HomeStack.navigationOptions = {
       focused={focused}
       name={
         Platform.OS === 'ios'
-          ? `ios-information-circle${focused ? '' : '-outline'}`
-          : 'md-information-circle'
+          ? `ios-home${focused ? '' : '-outline'}`
+          : 'md-home'
       }
     />
   ),

@@ -14,12 +14,24 @@ import {
   Button,
   Icon
 } from 'native-base';
+import { SQLite } from 'expo';
+
+const db = SQLite.openDatabase('aqual.db');
 
 export default class AddReminderScreen extends React.Component {
   static navigationOptions = {
     header: null,
   };
-
+  //リマインダーテーブル作成（初期化）
+  /*
+  componentDidMount(){
+    db.transaction(tx => {
+      tx.executeSql(
+        'create table if not exists reminders (id integer primary key not null, );'
+      );
+    });
+  }
+  */
   render() {
     return (
       <Container>
@@ -43,7 +55,7 @@ export default class AddReminderScreen extends React.Component {
 
 const styles = StyleSheet.create({
   header: {
-    paddingTop: 30,
+    paddingTop: 20,
     height: 54 + Header.currentHeight,
   },
   title: {

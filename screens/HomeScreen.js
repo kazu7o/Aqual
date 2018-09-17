@@ -32,6 +32,7 @@ export default class HomeScreen extends React.Component {
       hasCameraRollPermissions: null,
       tanks: null,
       refreshing: false,
+      list: [],
     };
   }
   async componentWillMount(){
@@ -57,6 +58,14 @@ export default class HomeScreen extends React.Component {
       this.setState({refreshing: false});
     }, 2000);
   }
+  sakujo() {
+    db.transaction(
+      tx => {
+        tx.executeSql("delete from tanks", []);
+      },
+    );
+  }
+
   render() {
     var Cards = [];
     if(this.state.tanks != null){
@@ -69,18 +78,21 @@ export default class HomeScreen extends React.Component {
                 <Body>
                   <Text>{tanks['_array'][i]['name']}</Text>
                   <Text note>{tanks['_array'][i]['date']}</Text>
+                  <Text note>{tanks['_array'][i]['id']}</Text>
                 </Body>
               </Left>
             </CardItem>
             <CardItem bordered>
               <Body>
                 <Image source={{ uri: tanks['_array'][i]['photo'] }} style={{ width: 200, height: 200}} />
-                <Text>{tanks['_array'][i]['type']}</Text>
+                <Text>タイプ：　{tanks['_array'][i]['type']}アクアリウム</Text>
               </Body>
             </CardItem>
             <CardItem>
               <Body>
-                <Text>・生体記録</Text>
+                <Button transparent>
+                  <Icon name='md-trash' />
+                </Button>
               </Body>
             </CardItem>
             {/*
@@ -96,6 +108,7 @@ export default class HomeScreen extends React.Component {
             */}
           </Card>
         );
+        this.state.list.push(tanks['_array'][i]['id']);
       }
     }
     return (
@@ -117,6 +130,11 @@ export default class HomeScreen extends React.Component {
           onRefresh={()=>{this._onRefresh()}}/>
         }>
           {Cards}
+          <Left>
+          <Button onPress={() => this.sakujo()}transparent>
+              <Icon name='md-trash' />
+          </Button>
+          </Left>
         </Content>
       </Container>
     );
