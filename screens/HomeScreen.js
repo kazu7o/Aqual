@@ -30,7 +30,7 @@ export default class HomeScreen extends React.Component {
     super(props);
     this.state = {
       hasCameraRollPermissions: null,
-      tanks: null,
+      notes: null,
       refreshing: false,
       list: [],
     };
@@ -43,7 +43,7 @@ export default class HomeScreen extends React.Component {
   componentWillMount(){
     db.transaction(
       tx => {
-        tx.executeSql("select * from tanks", [], (_, { rows }) => this.setState({tanks: rows}));
+        tx.executeSql("select * from notes", [], (_, { rows }) => this.setState({notes: rows}));
       },
     );
   }
@@ -51,7 +51,7 @@ export default class HomeScreen extends React.Component {
     this.setState({refreshing: true});
     db.transaction(
       tx => {
-        tx.executeSql("select * from tanks", [], (_, { rows }) => this.setState({tanks: rows}));
+        tx.executeSql("select * from notes", [], (_, { rows }) => this.setState({notes: rows}));
       },
     );
     setTimeout(() => {
@@ -61,31 +61,35 @@ export default class HomeScreen extends React.Component {
   sakujo() {
     db.transaction(
       tx => {
-        tx.executeSql("delete from tanks", []);
+        tx.executeSql("delete from notes", []);
       },
     );
   }
 
   render() {
     var Cards = [];
-    if(this.state.tanks != null){
-      var tanks = this.state.tanks;
-      for(var i = 0; i < tanks['length']; i++){
+    if(this.state.notes != null){
+      var notes = this.state.notes;
+      for(var i = 0; i < notes['length']; i++){
         Cards.push(
           <Card style={{flex: 0}} key={i}>
             <CardItem bordered>
               <Left>
                 <Body>
-                  <Text>{tanks['_array'][i]['name']}</Text>
-                  <Text note>{tanks['_array'][i]['date']}</Text>
-                  <Text note>{tanks['_array'][i]['id']}</Text>
+                  <Text>{notes['_array'][i]['title']}</Text>
+                  <Text note>{notes['_array'][i]['date']}</Text>
                 </Body>
               </Left>
             </CardItem>
             <CardItem bordered>
               <Body>
-                <Image source={{ uri: tanks['_array'][i]['photo'] }} style={{ width: 200, height: 200}} />
-                <Text>タイプ：　{tanks['_array'][i]['type']}アクアリウム</Text>
+                <Image source={{ uri: notes['_array'][i]['photo'] }} style={{ width: 200, height: 200}} />
+                {/*<Text>タイプ：　{notes['_array'][i]['type']}アクアリウム</Text>*/}
+              </Body>
+            </CardItem>
+            <CardItem bordered>
+              <Body>
+                <Text>{notes['_array'][i]['body']}</Text>
               </Body>
             </CardItem>
             <CardItem>
@@ -98,7 +102,7 @@ export default class HomeScreen extends React.Component {
             {/*
             <CardItem>
               <Body>
-                <Button transparent onPress={() => console.log(this.state.tanks)}>
+                <Button transparent onPress={() => console.log(this.state.notes)}>
                   <Right>
                     <Icon name='md-add'/>
                   </Right>
@@ -108,7 +112,7 @@ export default class HomeScreen extends React.Component {
             */}
           </Card>
         );
-        this.state.list.push(tanks['_array'][i]['id']);
+        this.state.list.push(notes['_array'][i]['id']);
       }
     }
     return (

@@ -22,10 +22,8 @@ import {
   Picker,
   ListItem,
   Radio,
-  Textarea,
-  Toast,
 } from 'native-base';
-import { ImagePicker, Permissions, SQLite, Camera } from 'expo';
+import { ImagePicker, Permissions, SQLite } from 'expo';
 
 const db = SQLite.openDatabase('aqual.db');
 
@@ -33,26 +31,21 @@ export default class AddTankScreen extends React.Component {
   static navigationOptions = {
     header: null,
   };
-
   constructor(props){
     super(props);
     this.state = {
-      //selected2: "淡水",
+      selected2: "淡水",
       chosenDate: new Date(),
       image: null,
       hasCameraRollPermissions: null,
-      hasCameraPermission: null,
-      type: Camera.Constants.Type.back,
     };
     this.setDate = this.setDate.bind(this);
   }
-
   setDate(newDate) {
     this.setState({
       chosenDate: newDate
     });
   }
-
   onValueChange2(value: string) {
     this.setState({
       selected2: value
@@ -65,22 +58,11 @@ export default class AddTankScreen extends React.Component {
     this.setState({ hasCameraRollPermissions: status === 'granted' });
   }
 
-  _takePhoto = async() => {
-    let result = await ImagePicker.launchCameraAsync({
-      allowEditing: false
-    });
-
-    console.log(result);
-
-    if (!result.cancelled){
-      this.setState({ image: result.uri });
-    }
-  }
-  //生体記録テーブル
+  //水槽テーブル作成（水槽追加）
   componentDidMount(){
     db.transaction(tx => {
       tx.executeSql(
-        'create table if not exists notes (id integer primary key not null, title text, date text, body text, photo text);'
+        'create table if not exists tanks (id integer primary key not null, name text, date text, type text, photo text);'
       );
     });
   }
@@ -97,19 +79,19 @@ export default class AddTankScreen extends React.Component {
             </Button>
           </Left>
           <Body>
-            <Title>新規追加</Title>
+            <Title>水槽追加</Title>
           </Body>
           <Right />
         </Header>
         <Content>
-          <Text style={styles.h1}>日記を追加</Text>
+          <Text style={styles.h1}>水槽を追加</Text>
           <Form>
             <Item stackedLabel>
-              <Label>タイトル</Label>
-              <Input onChangeText={(text) => {this.setState({title: text}); }}/>
+              <Label>名前</Label>
+              <Input onChangeText={(text) => {this.setState({name: text}); }}/>
             </Item>
             <Item stackedLabel>
-              <Label>日付</Label>
+              <Label>始めた日</Label>
               <DatePicker
                 defaultDate={new Date()}
                 minimumDate={new Date(1990, 1, 1)}
@@ -125,20 +107,26 @@ export default class AddTankScreen extends React.Component {
                 onDateChange={this.setDate}
               />
             </Item>
+            <Item stackedLabel picker>
+              <Label>水質</Label>
+              <Picker
+                mode="dropdown"
+                style={{ width: 120 }}
+                selectedValue={this.state.selected2}
+                onValueChange={this.onValueChange2.bind(this)}
+              >
+                <Picker.Item label="淡水" value="淡水" />
+                <Picker.Item label="海水" value="海水" />
+                <Picker.Item label="汽水" value="汽水" />
+              </Picker>
+            </Item>
             <Item stackedLabel>
-              <Label>写真</Label>
+              <Label>サムネイル</Label>
               <Button onPress={async () => {let result = await ImagePicker.launchImageLibraryAsync(); console.log(result); this.setState({image: result.uri})}} transparent>
                 <Text>ギャラリーから選択</Text>
               </Button>
-              <Button onPress={() => this._takePhoto()} transparent>
-                <Text>カメラを起動</Text>
-              </Button>
-              {hasCameraRollPermissions && image && <Image source={{ uri: image }} style={{ width: 200, height: 200}} />}
             </Item>
-            <Item stackedLabel>
-              <Label>本文</Label>
-              <Textarea rowSpan={5} bordered placeholder="ここに入力してください" style={{ width: 300 }} onChangeText={(text) => {this.setState({body: text}); }}/>
-            </Item>
+            {hasCameraRollPermissions && image && <Image source={{ uri: image }} style={{ width: 200, height: 200}} />}
             <Button block primary onPress={this.submit}>
               <Text>登録</Text>
             </Button>
@@ -150,19 +138,19 @@ export default class AddTankScreen extends React.Component {
   submit = () => {
     db.transaction(
       tx => {
-        count = tx.executeSql('select count(*) from notes');
-        tx.executeSql('insert into notes (id, title, date, body, photo) values (?, ?, ?, ?, ?)', [count + 1, this.state.title, this.state.chosenDate.toString().substr(4, 12), this.state.body, this.state.image],null,null);
-        tx.executeSql('select * from notes', [], (_, { rows }) => console.log(JSON.stringify(rows)));
+        count = tx.executeSql('select count(*) from tanks');
+        tx.executeSql('insert into tanks (id, name, date, type, photo) values (?, ?, ?, ?, ?)', [count + 1, this.state.name, this.state.chosenDate.toString().substr(4, 12), this.state.selected2, this.state.image],null,null);
+        tx.executeSql('select * from tanks', [], (_, { rows }) => console.log(JSON.stringify(rows)));
       },
     );
     this.props.navigation.navigate("Home");
   }
 
-  //全レコード削除（デバッグ用）
+  //全レコード削除
   sakujo = () => {
     db.transaction(
       tx => {
-        tx.executeSql("delete from notes;");
+        tx.executeSql("delete from tanks;");
       },
     );
     this.props.navigation.navigate("Home")

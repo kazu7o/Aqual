@@ -30,6 +30,7 @@ export default class CalcScreen extends React.Component {
       x: 0,
       y: 0,
       z: 0,
+      xyz: 0,
       selected2: "滴",
       perLiter: 1,
       medAmount: 0,
@@ -92,10 +93,10 @@ export default class CalcScreen extends React.Component {
             </Item>
             <Text>水槽の容量</Text>
             <Item>
-              <Input value={((this.state.x * this.state.y * this.state.z)/1000).toString()} /><Text style={{ width: 80}}>リットル</Text>
+              <Input value={((this.state.x * this.state.y * this.state.z)/1000).toString()} onChangeText={(text) => {this.setState({xyz: text}); }}/><Text style={{ width: 80}}>リットル</Text>
             </Item>
             <Left>
-              <Text style={styles.result}>{(((this.state.x * this.state.y * this.state.z)/1000)/this.state.perLiter * this.state.medAmount)}{this.state.selected2}</Text>
+              <Text style={styles.result}>{this.state.xyz/this.state.perLiter*this.state.medAmount}{this.state.selected2}</Text>
             </Left>
           </Form>
         </Content>
