@@ -32,7 +32,6 @@ export default class HomeScreen extends React.Component {
       hasCameraRollPermissions: null,
       notes: null,
       refreshing: false,
-      list: [],
     };
   }
   async componentWillMount(){
@@ -56,64 +55,61 @@ export default class HomeScreen extends React.Component {
     );
     setTimeout(() => {
       this.setState({refreshing: false});
-    }, 2000);
+    }, 1500);
   }
-  sakujo() {
+  all_sakujo() {
     db.transaction(
       tx => {
         tx.executeSql("delete from notes", []);
       },
     );
+    this._onRefresh();
   }
-
+  delCard(id){
+    console.log(id);
+    db.transaction(
+      tx => {
+        tx.executeSql("delete from notes where id = ?", [id]);
+      },
+    );
+    this._onRefresh();
+  }
   render() {
     var Cards = [];
     if(this.state.notes != null){
-      var notes = this.state.notes;
-      for(var i = 0; i < notes['length']; i++){
-        Cards.push(
-          <Card style={{flex: 0}} key={i}>
-            <CardItem bordered>
-              <Left>
-                <Body>
-                  <Text>{notes['_array'][i]['title']}</Text>
-                  <Text note>{notes['_array'][i]['date']}</Text>
-                </Body>
-              </Left>
-            </CardItem>
-            <CardItem bordered>
+      var notes = this.state.notes['_array'];
+      Cards = notes.map(cardInfo => (
+        <Card style={{flex: 0}} key={cardInfo.id}>
+          <CardItem bordered>
+            <Left>
               <Body>
-                <Image source={{ uri: notes['_array'][i]['photo'] }} style={{ width: 200, height: 200}} />
-                {/*<Text>タイプ：　{notes['_array'][i]['type']}アクアリウム</Text>*/}
+                <Text>{cardInfo.title}</Text>
+                <Text note>{cardInfo.date}</Text>
               </Body>
-            </CardItem>
-            <CardItem bordered>
-              <Body>
-                <Text>{notes['_array'][i]['body']}</Text>
-              </Body>
-            </CardItem>
-            <CardItem>
-              <Body>
-                <Button transparent>
-                  <Icon name='md-trash' />
-                </Button>
-              </Body>
-            </CardItem>
-            {/*
-            <CardItem>
-              <Body>
-                <Button transparent onPress={() => console.log(this.state.notes)}>
-                  <Right>
-                    <Icon name='md-add'/>
-                  </Right>
-                </Button>
-              </Body>
-            </CardItem>
-            */}
-          </Card>
-        );
-        this.state.list.push(notes['_array'][i]['id']);
-      }
+            </Left>
+          </CardItem>
+          <CardItem bordered>
+            <Body>
+              <Image source={{ uri: cardInfo.photo }} style={{ width: 200, height: 200}} />
+              {/*<Text>タイプ：　{notes['_array'][i]['type']}アクアリウム</Text>*/}
+            </Body>
+          </CardItem>
+          <CardItem bordered>
+            <Body>
+              <Text>{cardInfo.body}</Text>
+            </Body>
+          </CardItem>
+          <CardItem>
+            <Body>
+              <Right>
+              <Button style={styles.trash} onPress={() => this.delCard(cardInfo.id)} transparent>
+                <Icon name='md-trash' />
+              </Button>
+              </Right>
+            </Body>
+          </CardItem>
+        </Card>
+      ));
     }
     return (
       <Container>
@@ -134,11 +130,6 @@ export default class HomeScreen extends React.Component {
           onRefresh={()=>{this._onRefresh()}}/>
         }>
           {Cards}
-          <Left>
-          <Button onPress={() => this.sakujo()}transparent>
-              <Icon name='md-trash' />
-          </Button>
-          </Left>
         </Content>
       </Container>
     );
@@ -149,5 +140,8 @@ const styles = StyleSheet.create({
   header: {
     paddingTop: 30,
     height: 54 + Header.currentHeight,
+  },
+  trash: {
+    paddingLeft: 200,
   },
 });

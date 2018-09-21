@@ -37,8 +37,10 @@ export default class ReminderScreen extends React.Component {
 
   switchValue = (value) => {
     this.setState({ switching: value});
+    {/*
     const switchText = value ? 'ON' : 'OFF';
     alert(`今の状態はスイッチ${switchText}です`);
+    */}
   }
 
   componentWillMount(){
@@ -59,17 +61,41 @@ export default class ReminderScreen extends React.Component {
       this.setState({refreshing: false});
     }, 2000);
   }
-  sakujo() {
+  delCard(id) {
     db.transaction(
       tx => {
-        tx.executeSql("delete from reminders", []);
+        tx.executeSql("delete from reminders where id = ?", [id]);
       },
     );
+    this._onRefresh();
   }
   render() {
     var Cards = [];
     if(this.state.reminders != null){
-      var reminders = this.state.reminders;
+      var reminders = this.state.reminders['_array'];
+      Cards = reminders.map(reminderInfo => (
+        <Card style={{flex: 0}} key={reminderInfo.id}>
+          <CardItem bordered>
+            <Left>
+              <Body>
+                <Text>{reminderInfo.title}</Text>
+                <Text note>{reminderInfo.date}</Text>
+              </Body>
+            </Left>
+            <Right>
+              <Switch onValueChange={this.switchValue} value={this.state.switching}/>
+            </Right>
+          </CardItem>
+          <CardItem>
+            <Body>
+              <Button onPress={() => this.delCard(reminderInfo.id)} transparent>
+                <Icon name='md-trash' />
+              </Button>
+            </Body>
+          </CardItem>
+        </Card>
+      ));
+      {/*
       for(var i = 0; i < reminders['length']; i++){
         Cards.push(
           <Card style={{flex: 0}} key={i}>
@@ -94,7 +120,9 @@ export default class ReminderScreen extends React.Component {
           </Card>
         );
       }
+      */}
     }
+
     return (
       <Container>
         <Header style={styles.header}>

@@ -2,6 +2,7 @@ import React from 'react';
 import {
   Image,
   StyleSheet,
+  KeyboardAvoidingView,
 } from 'react-native';
 import {
   Container,
@@ -60,12 +61,24 @@ export default class AddTankScreen extends React.Component {
   }
 
   async componentWillMount(){
-    // カメラロールへのアクセス許可
+
+  }
+
+  _pickCameraroll = async() => {
     const {status} = await Permissions.askAsync(Permissions.CAMERA_ROLL);
     this.setState({ hasCameraRollPermissions: status === 'granted' });
+    let result = await ImagePicker.launchImageLibraryAsync({
+      allowEditing: false
+    });
+    console.log(result);
+    if(!result.cancelled){
+      this.setState({ image: result.uri });
+    }
   }
 
   _takePhoto = async() => {
+    const {status} = await Permissions.askAsync(Permissions.CAMERA);
+    this.setState({ hasCameraPermission: status === 'granted' });
     let result = await ImagePicker.launchCameraAsync({
       allowEditing: false
     });
@@ -103,46 +116,48 @@ export default class AddTankScreen extends React.Component {
         </Header>
         <Content>
           <Text style={styles.h1}>日記を追加</Text>
-          <Form>
-            <Item stackedLabel>
-              <Label>タイトル</Label>
-              <Input onChangeText={(text) => {this.setState({title: text}); }}/>
-            </Item>
-            <Item stackedLabel>
-              <Label>日付</Label>
-              <DatePicker
-                defaultDate={new Date()}
-                minimumDate={new Date(1990, 1, 1)}
-                maximumDate={new Date(2038, 12, 31)}
-                locale={"ja"}
-                timeZoneOffsetInMinutes={undefined}
-                modalTransparent={false}
-                animationType={"fade"}
-                androidMode={"default"}
-                //placeHolderText="開始日を選択してください"
-                textStyle={{ color: "green" }}
-                placeHolderTextStyle={{ color: "#d3d3d3" }}
-                onDateChange={this.setDate}
-              />
-            </Item>
-            <Item stackedLabel>
-              <Label>写真</Label>
-              <Button onPress={async () => {let result = await ImagePicker.launchImageLibraryAsync(); console.log(result); this.setState({image: result.uri})}} transparent>
-                <Text>ギャラリーから選択</Text>
+          <KeyboardAvoidingView behavior='padding'>
+            <Form>
+              <Item stackedLabel>
+                <Label>タイトル</Label>
+                <Input onChangeText={(text) => {this.setState({title: text}); }}/>
+              </Item>
+              <Item stackedLabel>
+                <Label>日付</Label>
+                <DatePicker
+                  defaultDate={new Date()}
+                  minimumDate={new Date(1990, 1, 1)}
+                  maximumDate={new Date(2038, 12, 31)}
+                  locale={"ja"}
+                  timeZoneOffsetInMinutes={undefined}
+                  modalTransparent={false}
+                  animationType={"fade"}
+                  androidMode={"default"}
+                  //placeHolderText="開始日を選択してください"
+                  textStyle={{ color: "green" }}
+                  placeHolderTextStyle={{ color: "#d3d3d3" }}
+                  onDateChange={this.setDate}
+                />
+              </Item>
+              <Item stackedLabel>
+                <Label>写真</Label>
+                <Button onPress={() => this._pickCameraroll()} transparent>
+                  <Text>ギャラリーから選択</Text>
+                </Button>
+                <Button onPress={() => this._takePhoto()} transparent>
+                  <Text>カメラを起動</Text>
+                </Button>
+                {hasCameraRollPermissions && image && <Image source={{ uri: image }} style={{ width: 200, height: 200}} />}
+              </Item>
+              <Item stackedLabel>
+                <Label>本文</Label>
+                <Textarea rowSpan={5} bordered placeholder="ここに入力してください" style={{ width: 300 }} onChangeText={(text) => {this.setState({body: text}); }}/>
+              </Item>
+              <Button block primary onPress={this.submit}>
+                <Text>登録</Text>
               </Button>
-              <Button onPress={() => this._takePhoto()} transparent>
-                <Text>カメラを起動</Text>
-              </Button>
-              {hasCameraRollPermissions && image && <Image source={{ uri: image }} style={{ width: 200, height: 200}} />}
-            </Item>
-            <Item stackedLabel>
-              <Label>本文</Label>
-              <Textarea rowSpan={5} bordered placeholder="ここに入力してください" style={{ width: 300 }} onChangeText={(text) => {this.setState({body: text}); }}/>
-            </Item>
-            <Button block primary onPress={this.submit}>
-              <Text>登録</Text>
-            </Button>
-          </Form>
+            </Form>
+          </KeyboardAvoidingView>
         </Content>
       </Container>
     );
