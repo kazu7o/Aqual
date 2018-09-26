@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Aqual",
-    "description": "A very interesting project.",
+    "description": "This app makes useful to manage your aqualium.",
     "slug": "Aqual",
     "privacy": "public",
     "sdkVersion": "29.0.0",
@@ -11,8 +11,7 @@
     "icon": "./assets/images/icon.png",
     "splash": {
       "image": "./assets/images/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#29ABE2"
+      "resizeMode": "cover",
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -21,7 +20,11 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.kztmr.aqual"
+    },
+    "android": {
+      "package": "com.kztmr.aqual"
     }
   }
 }
