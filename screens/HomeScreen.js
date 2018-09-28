@@ -101,11 +101,9 @@ export default class HomeScreen extends React.Component {
           </CardItem>
           <CardItem>
             <Body>
-              <Right>
               <Button style={styles.trash} onPress={() => this.delCard(cardInfo.id)} transparent>
                 <Icon name='md-trash' />
               </Button>
-              </Right>
             </Body>
           </CardItem>
         </Card>
@@ -140,8 +138,5 @@ const styles = StyleSheet.create({
   header: {
     paddingTop: 30,
     height: 54 + Header.currentHeight,
-  },
-  trash: {
-    paddingLeft: 200,
   },
 });
